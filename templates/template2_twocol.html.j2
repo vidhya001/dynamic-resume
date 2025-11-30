@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>{{ profile.name }} - Resume</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 11pt; margin: 32px 40px; color: #222; }
+    .header-name { font-size: 22pt; font-weight: bold; color: #004d99; }
+    .header-title { font-size: 12pt; margin-bottom: 8px; }
+    .layout { display: table; width: 100%; }
+    .main { display: table-cell; width: 70%; padding-right: 20px; vertical-align: top; }
+    .sidebar { display: table-cell; width: 30%; border-left: 1px solid #ddd; padding-left: 20px; vertical-align: top; font-size: 10pt; }
+    h2 { font-size: 12pt; color: #004d99; border-bottom: 1px solid #004d99; padding-bottom: 4px; margin-top: 16px; }
+    .job-header { font-weight: bold; }
+    ul { margin-top: 2px; margin-bottom: 8px; }
+    .sidebar-section-title { text-transform: uppercase; font-weight: bold; font-size: 10pt; margin-top: 12px; margin-bottom: 4px; color: #555;}
+  </style>
+</head>
+<body>
+  <div class="header-name">{{ profile.name }}</div>
+  <div class="header-title">{{ profile.title }}</div>
+  <div style="font-size:10pt; margin-bottom: 12px;">
+    {{ profile.location }} · {{ profile.phone }} · {{ profile.email }}
+  </div>
+
+  <div class="layout">
+    <div class="main">
+      <h2>Work Experience</h2>
+      {% for exp in experience %}
+        <p class="job-header">
+          {{ exp.title }}, {{ exp.company }}
+          <span style="float:right;">{{ exp.start }} – {{ exp.end }}</span><br/>
+          <span style="font-style: italic;">{{ exp.location }}</span>
+        </p>
+        <ul>
+          {% for b in exp.bullets %}
+            <li>{{ b }}</li>
+          {% endfor %}
+        </ul>
+      {% endfor %}
+
+      <h2>Education</h2>
+      {% for edu in education %}
+        <p class="job-header">
+          {{ edu.degree }}<br/>
+          {{ edu.institution }} — {{ edu.location }}
+          <span style="float:right;">{{ edu.date }}</span>
+        </p>
+      {% endfor %}
+    </div>
+
+    <div class="sidebar">
+      <div class="sidebar-section-title">Summary</div>
+      <p>{{ summary }}</p>
+
+      <div class="sidebar-section-title">Skills</div>
+      <ul>
+        {% for s in skills %}
+          <li>{{ s }}</li>
+        {% endfor %}
+      </ul>
+
+      {% if extra %}
+      <div class="sidebar-section-title">Other</div>
+      <ul>
+        {% for item in extra %}
+          <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

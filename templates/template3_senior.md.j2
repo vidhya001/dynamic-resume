@@ -1,0 +1,39 @@
+{{ profile.name | upper }}
+{{ profile.location }} · {{ profile.phone }} · {{ profile.email }}
+
+# {{ profile.title }}
+
+{{ summary }}
+
+---
+
+## Core Skills
+
+{{ skills | join(', ') }}
+
+---
+
+## Career Highlights
+
+{% for exp in experience %}
+**{{ exp.company }} — {{ exp.title }} ({{ exp.start }} – {{ exp.end }})**
+
+{% for b in exp.bullets %}
+- {{ b }}
+{% endfor %}
+
+{% endfor %}
+
+## Education
+
+{% for edu in education %}
+**{{ edu.degree }}**, {{ edu.institution }} — {{ edu.location }} ({{ edu.date }})
+{% endfor %}
+
+{% if extra %}
+## Leadership & Other
+
+{% for item in extra %}
+- {{ item }}
+{% endfor %}
+{% endif %}

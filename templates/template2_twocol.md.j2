@@ -1,0 +1,39 @@
+{{ profile.name }}
+{{ profile.title }}
+{{ profile.location }} · {{ profile.phone }} · {{ profile.email }}
+
+---
+
+## Summary
+
+{{ summary }}
+
+---
+
+## Experience
+
+{% for exp in experience %}
+**{{ exp.title }}**, {{ exp.company }} ({{ exp.start }} – {{ exp.end }}) — {{ exp.location }}
+{% for b in exp.bullets %}
+- {{ b }}
+{% endfor %}
+
+{% endfor %}
+
+## Skills
+
+{{ skills | join(' | ') }}
+
+## Education
+
+{% for edu in education %}
+- **{{ edu.degree }}**, {{ edu.institution }} — {{ edu.location }} ({{ edu.date }})
+{% endfor %}
+
+{% if extra %}
+## Other
+
+{% for item in extra %}
+- {{ item }}
+{% endfor %}
+{% endif %}

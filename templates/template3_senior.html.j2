@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>{{ profile.name }} - Senior Resume</title>
+  <style>
+    body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; margin: 32px 40px; color: #222; }
+    .top-header { text-align: center; }
+    .top-name { font-size: 22pt; font-weight: bold; letter-spacing: 1px; }
+    .top-contact { font-size: 10pt; margin-top: 4px; }
+    .banner { background-color: #004b8d; color: white; padding: 6px 10px; margin-top: 16px; text-align: center; font-weight: bold; text-transform: uppercase; }
+    .tagline { font-style: italic; margin-top: 8px; text-align: center; }
+    .section-title { background-color: #e0e7f1; padding: 4px 6px; margin-top: 16px; margin-bottom: 4px; font-weight: bold; text-transform: uppercase; font-size: 10pt; }
+    ul { margin-top: 2px; margin-bottom: 6px; }
+    .job-header { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="top-name">{{ profile.name }}</div>
+    <div class="top-contact">
+      {{ profile.location }} · {{ profile.phone }} · {{ profile.email }}
+    </div>
+  </div>
+
+  <div class="banner">{{ profile.title }}</div>
+  <div class="tagline">{{ summary }}</div>
+
+  <div class="section-title">Core Skills</div>
+  <p>{{ skills | join(', ') }}</p>
+
+  <div class="section-title">Career Highlights</div>
+  {% for exp in experience %}
+    <p class="job-header">
+      {{ exp.company }} — {{ exp.title }}
+      <span style="float:right;">{{ exp.start }} – {{ exp.end }}</span>
+    </p>
+    <ul>
+      {% for b in exp.bullets %}
+        <li>{{ b }}</li>
+      {% endfor %}
+    </ul>
+  {% endfor %}
+
+  <div class="section-title">Education</div>
+  {% for edu in education %}
+    <p class="job-header">
+      {{ edu.degree }}<br/>
+      {{ edu.institution }} — {{ edu.location }}
+      <span style="float:right;">{{ edu.date }}</span>
+    </p>
+  {% endfor %}
+
+  {% if extra %}
+  <div class="section-title">Leadership & Other</div>
+  <ul>
+    {% for item in extra %}
+      <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</body>
+</html>
