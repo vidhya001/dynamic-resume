@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Generate Resume — Demo</title>
+  <style>
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:24px;background:#f6f7fb;color:#0f172a}
+    .card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 6px 18px rgba(15,23,42,0.06);max-width:1100px;margin:0 auto}
+    button{background:#0b69ff;color:#fff;border:0;padding:10px 16px;border-radius:8px;font-weight:600;cursor:pointer}
+    select, textarea, input{padding:6px;border-radius:6px;border:1px solid #cbd5e1;width:100%;font-family:inherit;font-size:14px}
+    textarea{height:140px}
+    .row{display:flex;gap:12px;align-items:center}
+    pre{background:#0b1220;color:#e6eef8;padding:12px;border-radius:8px;overflow:auto;max-height:420px}
+    iframe{width:100%;height:600px;border:1px solid #cbd5e1;border-radius:8px;background:#fff}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Generate Resume</h2>
+
+    <label>Candidate Profile (JSON)</label>
+    <textarea id="candidate_profile"></textarea>
+
+    <label>Job Description</label>
+    <textarea id="job_description"></textarea>
+
+    <div class="row">
+      <div style="flex:1">
+        <label>Template ID</label>
+        <select id="template_id">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
+      </div>
+      <div style="flex:1">
+        <label>Output Format</label>
+        <select id="output_format">
+          <option value="html">html</option>
+          <option value="md">md</option>
+        </select>
+      </div>
+      <div style="flex:1">
+        <label>Top K</label>
+        <input id="top_k" type="number" value="12" />
+      </div>
+    </div>
+
+    <div style="margin:14px 0" class="row">
+      <button id="sendBtn">Generate Resume</button>
+      <div id="status">Idle</div>
+    </div>
+
+    <div id="render_html" style="display:none">
+      <label>Rendered HTML Resume</label>
+      <iframe id="html_frame"></iframe>
+    </div>
+
+    <div id="render_md" style="display:none">
+      <label>Markdown Resume</label>
+      <pre id="md_output"></pre>
+    </div>
+  </div>
+
+  <script>
+    const endpoint = '<url>/generate-resume';
+    const candEl = document.getElementById('candidate_profile');
+    const jdEl = document.getElementById('job_description');
+    const tidEl = document.getElementById('template_id');
+    const fmtEl = document.getElementById('output_format');
+    const topkEl = document.getElementById('top_k');
+    const statusEl = document.getElementById('status');
+
+    candEl.value = `{
+  "name": "Meera Shah",
+  "title": "Senior Full Stack Engineer",
+  "location": "Pune, India",
+  "email": "meera.shah@example.com",
+  "phone": "+91-98765-00002",
+  "summary": "Senior full stack engineer with 6+ years of experience designing and shipping SaaS products end-to-end using React, TypeScript, Node.js, and PostgreSQL. Strong focus on building reliable APIs, improving performance, and collaborating closely with product and design.",
+  "skills": [
+    "JavaScript","TypeScript","React","Next.js","Redux","Node.js","Express","REST APIs","PostgreSQL","MongoDB","Docker","Kubernetes","AWS (EC2, RDS, S3, CloudWatch)","GitHub Actions","Unit Testing (Jest, React Testing Library)"
+  ],
+  "experience": [
+    {
+      "company": "CloudSprint",
+      "title": "Senior Software Engineer",
+      "location": "Pune, India",
+      "start": "2021-03",
+      "end": "Present",
+      "bullets": [
+        "Designed and implemented RESTful APIs in Node.js/Express powering multi-tenant billing and subscription workflows for 50+ B2B customers.",
+        "Led the migration of a legacy monolith UI to a modular React + TypeScript architecture, reducing bundle size by 35% and improving Lighthouse performance score from 68 to 92.",
+        "Implemented role-based access control (RBAC) and fine-grained permissions in the backend, improving security posture and passing internal security audit with zero critical findings.",
+        "Optimized PostgreSQL queries and added caching at the API layer, cutting average endpoint latency from 450ms to ~160ms under peak load.",
+        "Collaborated with product, design, and QA to define API contracts, acceptance criteria, and release plans for major features on a 2-week sprint cadence.",
+        "Mentored 3 junior engineers on React, Node.js, and testing best practices; introduced coding guidelines and PR checklist that reduced production bugs by ~20%."
+      ]
+    },
+    {
+      "company": "TechNova Labs",
+      "title": "Full Stack Engineer",
+      "location": "Pune, India",
+      "start": "2019-01",
+      "end": "2021-02",
+      "bullets": [
+        "Built customer-facing dashboards in React and integrated them with Node.js microservices and a PostgreSQL data warehouse.",
+        "Implemented JWT-based authentication and refresh token flows to secure internal admin tools.",
+        "Developed CI/CD pipelines using GitHub Actions to automate tests and deployments to staging and production environments.",
+        "Worked closely with the analytics team to expose reporting APIs and scheduled jobs for daily aggregates."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor of Engineering in Information Technology",
+      "institution": "Savitribai Phule Pune University (SPPU)",
+      "location": "Pune, India",
+      "date": "2018",
+      "details": [
+        "Graduated with First Class with Distinction.",
+        "Final-year project: Built a campus placement portal using React and Node.js, used by 500+ students."
+      ]
+    }
+  ],
+  "extra": [
+    "Speaker at local JavaScript meetup: \\"Scaling React Apps in Production\\" (2023).",
+    "Regularly contributes to internal frontend component library and documentation.",
+    "Acted as on-call engineer in production support rotation, handling P1/P2 incidents for customer-facing services."
+  ]
+}`;
+    jdEl.value = `Job Title: Senior Full Stack Engineer (React + Node.js)
+
+About the Role:
+We are looking for a Senior Full Stack Engineer to help us build and scale our B2B SaaS platform used by enterprise customers across fintech and e-commerce. You will work closely with product managers, designers, and other engineers to deliver high-quality features end-to-end.
+
+Key Responsibilities:
+- Design, develop, and maintain RESTful APIs and backend services using Node.js, Express, and PostgreSQL.
+- Build modern, responsive, and accessible user interfaces using React, TypeScript, and component libraries.
+- Collaborate with product and design to translate requirements and Figma designs into production-ready features.
+- Own features end-to-end: technical design, implementation, testing, deployment, and monitoring.
+- Optimize performance across the stack, including API response times, database queries, and frontend rendering.
+- Write unit and integration tests to ensure high code quality and reliability.
+- Participate in code reviews, architecture discussions, and provide mentorship to junior engineers.
+- Work in an agile environment with 2-week sprints, delivering incremental value to customers.
+
+Requirements:
+- 5+ years of hands-on experience building web applications with JavaScript/TypeScript.
+- Strong experience with React (hooks, state management, routing) and modern frontend tooling.
+- Solid experience building REST APIs with Node.js and Express (or similar frameworks).
+- Practical experience with relational databases (preferably PostgreSQL), including schema design and query optimization.
+- Experience with Git, CI/CD pipelines, and automated testing frameworks (Jest, Mocha, etc.).
+- Familiarity with cloud platforms (AWS, GCP, or Azure); experience with Docker and containerized deployments is a plus.
+- Strong communication skills and ability to work cross-functionally with product, design, and QA.
+
+Nice to Have:
+- Experience with microservices architecture or event-driven systems.
+- Exposure to monitoring/observability tools like Prometheus, Grafana, or CloudWatch.
+- Previous experience in B2B SaaS, fintech, or payments domain.`;
+
+    document.getElementById('sendBtn').onclick = async () => {
+      statusEl.textContent = 'Sending...';
+
+      let candidate_profile;
+      try { candidate_profile = JSON.parse(candEl.value); }
+      catch(e){ alert('Invalid JSON in candidate_profile'); return; }
+
+      const body = {
+        candidate_profile,
+        job_description: jdEl.value,
+        template_id: Number(tidEl.value),
+        top_k: Number(topkEl.value),
+        output_format: fmtEl.value
+      };
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const text = await res.text();
+      statusEl.textContent = 'Done';
+
+      document.getElementById('render_html').style.display = 'none';
+      document.getElementById('render_md').style.display = 'none';
+
+      if(fmtEl.value === 'html'){
+        const iframe = document.getElementById('html_frame');
+        iframe.srcdoc = text;
+        document.getElementById('render_html').style.display = 'block';
+      } else {
+        document.getElementById('md_output').textContent = text;
+        document.getElementById('render_md').style.display = 'block';
+      }
+    };
+  </script>
+</body>
+</html>
